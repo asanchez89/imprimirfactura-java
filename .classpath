@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Openmindeo/Documents/Proyectos/SistemaMedico/libs/TFHKA_Venezuela_-_JAVA_SDK/TFHKA Venezuela - JAVA SDK/Library/TfhkaJava.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Openmindeo/Documents/Proyectos/SistemaMedico/libs/TFHKA_Venezuela_-_JAVA_SDK/TFHKA Venezuela - JAVA SDK/Otros/jssc.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Openmindeo/Documents/Proyectos/SistemaMedico/libs/json-simple-1.1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Openmindeo/Documents/Proyectos/code/libs/TFHKA_Venezuela_-_JAVA_SDK/TFHKA Venezuela - JAVA SDK/Library/TfhkaJava.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Openmindeo/Documents/Proyectos/code/libs/TFHKA_Venezuela_-_JAVA_SDK/TFHKA Venezuela - JAVA SDK/Otros/jssc.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Openmindeo/Documents/Proyectos/code/libs/json-simple-1.1.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="output" path="bin"/>

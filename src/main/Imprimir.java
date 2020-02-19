@@ -103,7 +103,7 @@ public class Imprimir {
 	    		this.enviarComando(entry.getValue().getCmdDescuento());
         }
 	   
-	    this.enviarComando("101");
+	   this.enviarComando("101");
 	}
 	
 	private void imprimirNotaDeCredito(String[] args) throws FileNotFoundException, IOException, ParseException, PrinterException, InterruptedException, java.text.ParseException {
@@ -137,11 +137,12 @@ public class Imprimir {
 		if(productos != null) {
 			for (Producto producto : productos) {
 				int index = producto.getIndex();
-				BigDecimal descuento = ((factura.getSeguroDescuento().compareTo(BigDecimal.ZERO)==1)?factura.getSeguroDescuento():(factura.getJubilaDescuento().compareTo(BigDecimal.ZERO)==1)?factura.getJubilaDescuento():BigDecimal.ZERO).divide(new BigDecimal(100));
+				BigDecimal descuento = (factura.getAlquilerDescuento().compareTo(BigDecimal.ZERO)==1)?factura.getAlquilerDescuento():((factura.getSeguroDescuento().compareTo(BigDecimal.ZERO)==1)?factura.getSeguroDescuento():(factura.getJubilaDescuento().compareTo(BigDecimal.ZERO)==1)?factura.getJubilaDescuento():BigDecimal.ZERO).divide(new BigDecimal(100));
 				BigDecimal precioAnterior = producto.getPrecioOriginal()==null?producto.getPrecio().divide(BigDecimal.ONE.subtract(descuento), RoundingMode.HALF_EVEN):producto.getPrecioOriginal();
-				String precioF = precioFormat.format(precioAnterior).replace(".", "").replace(",", "");
+				String precioF = precioFormat.format((factura.getAlquilerReintegro().compareTo(BigDecimal.ZERO)==1)?precioAnterior.multiply(factura.getAlquilerReintegro().add(new BigDecimal(100)).divide(new BigDecimal(100))):precioAnterior).replace(".", "").replace(",", "");
 				String cantidadF = cantidadFormat.format(producto.getCantidad()).replace(".", "").replace(",", "");
 				String cmdString = symbols[0]+precioF+cantidadF+producto.getNombre();
+				//System.out.println(cmdString);
 				
 				Comando comando = new Comando();
 				comando.setCmdPrimario(cmdString);
@@ -151,6 +152,7 @@ public class Imprimir {
 				if(descuento.compareTo(BigDecimal.ZERO)==1) {
 					String descuentoF = descuentoFormat.format(descuento.multiply(new BigDecimal(100))).replace(".", "").replace(",", "");
 					String descCommand = "p-"+descuentoF;
+					//System.out.println(descCommand);
 					comando.setCmdDescuento(descCommand);
 				}
 			}
@@ -162,16 +164,15 @@ public class Imprimir {
 					continue;
 				}
 				int index = concepto.getIndex();
-				BigDecimal descuento = ((factura.getSeguroDescuento().compareTo(BigDecimal.ZERO)==1)?factura.getSeguroDescuento():(factura.getJubilaDescuento().compareTo(BigDecimal.ZERO)==1)?factura.getJubilaDescuento():BigDecimal.ZERO);
+				BigDecimal descuento = ((factura.getAlquilerDescuento().compareTo(BigDecimal.ZERO)==1)?factura.getAlquilerDescuento():((factura.getSeguroDescuento().compareTo(BigDecimal.ZERO)==1)?factura.getSeguroDescuento():(factura.getJubilaDescuento().compareTo(BigDecimal.ZERO)==1)?factura.getJubilaDescuento():BigDecimal.ZERO));
 				
-				BigDecimal descuentoConcepto = ((factura.getJubilaDescuento().compareTo(BigDecimal.ZERO)==0) && factura.getAseguradora().equals("0") && (concepto.getDescuento().compareTo(BigDecimal.ZERO)==0) ? descuento : ((factura.getJubilaDescuento().compareTo(BigDecimal.ZERO)==1) && factura.getAseguradora().equals("0") && (concepto.getDescuento().compareTo(BigDecimal.ZERO)==1) ? concepto.getDescuento() : BigDecimal.ZERO));
-				
+				BigDecimal descuentoConcepto = (factura.getAlquilerDescuento().compareTo(BigDecimal.ZERO)==1)?factura.getAlquilerDescuento():((factura.getJubilaDescuento().compareTo(BigDecimal.ZERO)==0) && factura.getAseguradora().equals("0") && (concepto.getDescuento().compareTo(BigDecimal.ZERO)==0) ? descuento : ((factura.getJubilaDescuento().compareTo(BigDecimal.ZERO)==1) && factura.getAseguradora().equals("0") && (concepto.getDescuento().compareTo(BigDecimal.ZERO)==1) ? concepto.getDescuento() : BigDecimal.ZERO));
 				descuentoConcepto = descuentoConcepto.compareTo(BigDecimal.ZERO)==1 || (concepto.getSegurodescuento().equals("1") && !factura.getAseguradora().equals("0"))?  descuentoConcepto : descuento;
 				descuentoConcepto = concepto.getSegurodescuento().equals("1") && !factura.getAseguradora().equals("0") ?  descuentoConcepto : factura.getAseguradora().equals("0") ? descuentoConcepto : descuento;
 				descuentoConcepto = concepto.getDescontable().equals("0") ? descuentoConcepto.divide(new BigDecimal(100)):BigDecimal.ZERO;
 				BigDecimal precioAnterior = concepto.getPrecioOriginal()==null?concepto.getPrecio().divide(BigDecimal.ONE.add(concepto.getImpuesto().divide(new BigDecimal(100))), RoundingMode.HALF_EVEN).divide(BigDecimal.ONE.subtract(descuentoConcepto), RoundingMode.HALF_EVEN):concepto.getPrecioOriginal();
 				
-				String precioF = precioFormat.format(precioAnterior).replace(".", "").replace(",", "");
+				String precioF = precioFormat.format((factura.getAlquilerReintegro().compareTo(BigDecimal.ZERO)==1)?precioAnterior.multiply(factura.getAlquilerReintegro().add(new BigDecimal(100)).divide(new BigDecimal(100))):precioAnterior).replace(".", "").replace(",", "");
 				String cantidadF = cantidadFormat.format(concepto.getCantidad()).replace(".", "").replace(",", "");
 				String taxSymbol = (concepto.getImpuesto().compareTo(BigDecimal.ZERO)==0)?symbols[0]:symbols[1];
 				if(concepto.getImpuesto().compareTo(new BigDecimal(7))==0)
@@ -182,6 +183,8 @@ public class Imprimir {
 					taxSymbol = symbols[3];
 				
 				String cmdString = taxSymbol+precioF+cantidadF+concepto.getNombre();
+				//System.out.println(cmdString);
+				
 				Comando comando = new Comando();
 				comando.setCmdPrimario(cmdString);
 				comando.setIndex(index);
@@ -190,6 +193,7 @@ public class Imprimir {
 				if(concepto.getDescontable().equals("0") && descuentoConcepto.compareTo(BigDecimal.ZERO)==1) {
 					String descuentoF = descuentoFormat.format(descuentoConcepto.multiply(new BigDecimal(100))).replace(".", "").replace(",", "");
 					String descCommand = "p-"+descuentoF;
+					//System.out.println(descCommand);
 					comando.setCmdDescuento(descCommand);
 				}
 			}
@@ -215,6 +219,8 @@ public class Imprimir {
 		factura.setJubilaDescuento(new BigDecimal((String) facturaJson.get("jubila-descuento")));
 		factura.setSeguroDescuento(new BigDecimal((String) facturaJson.get("seguro-descuento")));
 		factura.setSeguroReintegro(new BigDecimal((String) facturaJson.get("seguro-reintegro")));
+		factura.setAlquilerDescuento(new BigDecimal((String) facturaJson.get("alquiler-descuento")));
+		factura.setAlquilerReintegro(new BigDecimal((String) facturaJson.get("alquiler-reintegro")));
 		ArrayList<Concepto> conceptoList = new ArrayList<>();
 		ArrayList<Producto> productoList = new ArrayList<>();
 		
